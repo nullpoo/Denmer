@@ -6,16 +6,25 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    /** 開始フラグ */
+    private boolean mIsStart;
 
     /** 開始ボタン */
     private Button mStartButton;
 
     /** 停止ボタン */
     private Button mStopButton;
+
+    /** パターン選択スピナー */
+    private Spinner mPatternSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +34,31 @@ public class MainActivity extends ActionBarActivity {
         // ボタンの初期化
         mStartButton = (Button) findViewById(R.id.start);
         mStopButton = (Button) findViewById(R.id.stop);
+        mPatternSpinner = (Spinner) findViewById(R.id.pattern_spinner);
         mStartButton.setOnClickListener(mStartClickListener);
         mStopButton.setOnClickListener(mStopClickListener);
+        String[] pattens = getResources().getStringArray(R.array.vibrate_pattern_list);
+        ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), R.layout.pattern_spinner_item, pattens);
+        adapter.setDropDownViewResource(R.layout.pattern_spinner_dropdown_item);
+        mPatternSpinner.setAdapter(adapter);
+
+        mPatternSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!mIsStart) {
+                    return;
+                }
+
+                Intent intent = new Intent(getApplicationContext(), VibrateService.class);
+                changePattern(intent);
+                startService(intent);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
 
@@ -52,11 +84,35 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * スピナーからパターンを切り替える
+     *
+     * @param intent
+     */
+    private void changePattern(Intent intent) {
+        switch (mPatternSpinner.getSelectedItemPosition()) {
+            case 0:
+                intent.putExtra(VibrateService.PARAM_PATTERN, VibrateService.mPattern1);
+                break;
+            case 1:
+                intent.putExtra(VibrateService.PARAM_PATTERN, VibrateService.mPattern2);
+                break;
+            case 2:
+                intent.putExtra(VibrateService.PARAM_PATTERN, VibrateService.mPattern3);
+                break;
+            default:
+                break;
+        }
+    }
+
     /** 開始ボタンのリスナー */
     private View.OnClickListener mStartClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            startService(new Intent(getApplicationContext(), VibrateService.class));
+            Intent intent = new Intent(getApplicationContext(), VibrateService.class);
+            changePattern(intent);
+            startService(intent);
+            mIsStart = true;
         }
     };
 
@@ -65,6 +121,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onClick(View v) {
             stopService(new Intent(getApplicationContext(), VibrateService.class));
+            mIsStart = false;
         }
     };
 
