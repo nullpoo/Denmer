@@ -6,5 +6,11 @@
 
     <string name="button_start">開始</string>
     <string name="button_stop">停止</string>
+    
+    <string-array name="vibrate_pattern_list">
+        <item>パターン1</item>
+        <item>パターン2</item>
+        <item>パターン3</item>
+    </string-array>
 
 </resources>

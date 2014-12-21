@@ -10,6 +10,14 @@ import android.os.Vibrator;
  */
 public class VibrateService extends Service {
 
+    public static final String PARAM_PATTERN = "ParamPattern";
+
+    public static final long[] mPattern1 = {0, 10000};
+
+    public static final long[] mPattern2 = {100, 1000};
+
+    public static final long[] mPattern3 = {100, 100};
+
     /** バイブレータ */
     private Vibrator mVibrator;
 
@@ -27,8 +35,9 @@ public class VibrateService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // 振動パターンを作成
-        long[] pattern = {0, 10000};
+        // 振動パターンを取得
+        long[] pattern = intent.getLongArrayExtra(PARAM_PATTERN);
+
         // 振動を開始
         mVibrator.vibrate(pattern, 0);
         return super.onStartCommand(intent, flags, startId);

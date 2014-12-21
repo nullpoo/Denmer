@@ -15,10 +15,18 @@
         android:layout_height="1dip"
         android:layout_centerInParent="true"/>
 
+    <Spinner
+        android:id="@+id/pattern_spinner"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <Button
         android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/pattern_spinner"
         android:layout_toLeftOf="@id/center_space"
         android:text="@string/button_start"/>
 
@@ -26,6 +34,7 @@
         android:id="@+id/stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/pattern_spinner"
         android:layout_toRightOf="@id/center_space"
         android:text="@string/button_stop"/>
 
