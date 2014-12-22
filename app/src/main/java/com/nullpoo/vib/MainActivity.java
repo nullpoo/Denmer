@@ -1,6 +1,9 @@
 package com.nullpoo.vib;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -38,7 +41,7 @@ public class MainActivity extends ActionBarActivity {
         mStartButton.setOnClickListener(mStartClickListener);
         mStopButton.setOnClickListener(mStopClickListener);
         String[] pattens = getResources().getStringArray(R.array.vibrate_pattern_list);
-        ArrayAdapter adapter = new ArrayAdapter(getApplicationContext(), R.layout.pattern_spinner_item, pattens);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.pattern_spinner_item, pattens);
         adapter.setDropDownViewResource(R.layout.pattern_spinner_dropdown_item);
         mPatternSpinner.setAdapter(adapter);
 
@@ -105,6 +108,19 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /** スリープ時に継続するためのレシーバー */
+    public BroadcastReceiver mVibrateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF) && mIsStart) {
+                Intent serviceIntent = new Intent(getApplicationContext(), VibrateService.class);
+                changePattern(serviceIntent);
+                startService(serviceIntent);
+                mIsStart = true;
+            }
+        }
+    };
+
     /** 開始ボタンのリスナー */
     private View.OnClickListener mStartClickListener = new View.OnClickListener() {
         @Override
@@ -112,6 +128,11 @@ public class MainActivity extends ActionBarActivity {
             Intent intent = new Intent(getApplicationContext(), VibrateService.class);
             changePattern(intent);
             startService(intent);
+
+            // スリープ時にも継続するように設定
+            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(mVibrateReceiver, filter);
+
             mIsStart = true;
         }
     };
