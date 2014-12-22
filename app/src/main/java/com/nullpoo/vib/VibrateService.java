@@ -40,7 +40,7 @@ public class VibrateService extends Service {
 
         // 振動を開始
         mVibrator.vibrate(pattern, 0);
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
